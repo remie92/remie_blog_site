@@ -8,7 +8,7 @@
 <?php
 //require 'views/elite.php';
 
-$system_coordinates = [];
+$system_data_export = [];
 $screenshots=[];
 //var_dump($funky);
 //
@@ -21,10 +21,10 @@ $screenshots=[];
 
 
 
-$stmt = $db->prepare("SELECT * FROM `elite_events`");
+$stmt = $db->prepare("SELECT * FROM `elite_star_systems`");
 
 $stmt->execute();
-$output = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$star_system_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 function coordinateToString($coordinate) {
@@ -43,26 +43,36 @@ function convertScreenshotPath(string $path, bool $thumbnail = false): string
 }
 
 $current_pos=array(0,0,0);
-foreach ($output as $event){
-    $entry = json_decode($event["data"], true);
-    if ($entry["event"] == "FSDJump"){
-        //echo "Moved from ".coordinateToString($current_pos)." to ".coordinateToString($entry["StarPos"])."\n";
-        $current_pos=$entry["StarPos"];
-        array_push($system_coordinates,$current_pos);
+
+foreach ($star_system_data as $star_system) {
+    if(($star_system['coordX'])) {
+        $current_pos = [$star_system['coordX'], $star_system['coordY'], $star_system['coordZ']];
+        $star_system_name = $star_system['name'];
+        $star_system_type = $star_system['star_type'];
+        array_push($system_data_export, [$current_pos, $star_system_name, $star_system_type]);
     }
-    if ($entry["event"] == "Screenshot"){
-        array_push($screenshots,[$current_pos,convertScreenshotPath($entry["Filename"],true)]);
-//        echo "Made screenshot linked: ";
-//        echo "<a href=".convertScreenshotPath($entry["Filename"],false)."> here!</a>";
-//
-//        echo " at ".coordinateToString($current_pos)."\n";
-//        echo "<br>";
-//        echo "<img src=\"".convertScreenshotPath($entry["Filename"],true)."\" alt='screenshot' width='500'>";
-    }
-    //echo $entry["timestamp"]." ".$entry["event"]." ".$entry["StarPos"][0]." ".$entry["StarPos"][1]." ".$entry["StarPos"][2];
-//    echo "<br>";
-//    echo "<br>";
 }
+
+//foreach ($output as $event){
+//    $entry = json_decode($event["data"], true);
+//    if ($entry["event"] == "FSDJump"){
+//        //echo "Moved from ".coordinateToString($current_pos)." to ".coordinateToString($entry["StarPos"])."\n";
+//        $current_pos=$entry["StarPos"];
+//        array_push($system_coordinates,$current_pos);
+//    }
+//    if ($entry["event"] == "Screenshot"){
+//        array_push($screenshots,[$current_pos,convertScreenshotPath($entry["Filename"],true)]);
+////        echo "Made screenshot linked: ";
+////        echo "<a href=".convertScreenshotPath($entry["Filename"],false)."> here!</a>";
+////
+////        echo " at ".coordinateToString($current_pos)."\n";
+////        echo "<br>";
+////        echo "<img src=\"".convertScreenshotPath($entry["Filename"],true)."\" alt='screenshot' width='500'>";
+//    }
+//    //echo $entry["timestamp"]." ".$entry["event"]." ".$entry["StarPos"][0]." ".$entry["StarPos"][1]." ".$entry["StarPos"][2];
+////    echo "<br>";
+////    echo "<br>";
+//}
 
 
 ?>
@@ -70,9 +80,9 @@ foreach ($output as $event){
 
 <script>
     // json_encode safely translates PHP arrays/objects directly into JavaScript syntax
-    const star_systems = <?php echo json_encode($system_coordinates); ?>;
+    const star_systems = <?php echo json_encode($system_data_export); ?>;
     const screenshots = <?php echo json_encode($screenshots); ?>;
-    console.log(screenshots);
+    console.log(star_systems);
 </script>
 
 <script src="/web/scripts/elite.js"></script>
