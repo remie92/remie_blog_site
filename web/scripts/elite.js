@@ -62,9 +62,9 @@ class Screenshot{
     }
     randomize(){
         this.rotationX=random(0,45);
-        this.rotationY=random(0,360);
+        this.rotationY=random(-30,30);
         for(let i=0;i<this.coord.length;i++){
-            this.coord[i]=this.coord[i]+random(-50,50);
+            this.coord[i]=this.coord[i]+random(-80,80);
         }
     }
 }
