@@ -6,13 +6,8 @@ class System {
     constructor(coordinate,color) {
         this.coord = coordinate;
         this.color=color;
-        this.screenshots = [];
         this.connected_coords=[];
         this.name="";
-    }
-
-    add_screenshot(screenshot) {
-        this.screenshots.push(screenshot);
     }
     add_connected(coord) {
         this.connected_coords.push(coord);
@@ -35,39 +30,50 @@ class System {
             line(this.coord[0], this.coord[1], this.coord[2], prev_coord[0], prev_coord[1], prev_coord[2]);
         }
 
-        if (this.screenshots.length > 0) {
-            strokeWeight(6);
-            stroke(25, 98, 85);
-            let timeVal = seconds / 2;
-            let index = floor(timeVal) % this.screenshots.length;
-            let screenshot = this.screenshots[index];
-            texture(screenshot);
-            push();
-            translate(this.coord[0], this.coord[1], this.coord[2]);
-            rotateY(30);
-            rotateX(45);
-            rect(0, 0, screenshot.width / 20, screenshot.height / 20);
-            resetShader();
-            fill(25, 98, 85);
-            stroke(200,98,85);
-            textSize(10);
-            text(this.name,0,-5);
-            pop();
-        }
-
     }
 }
 
 
 class Screenshot{
-    constructor(coordinate,rotationX,rotateY) {
+    constructor(coordinate,image,system_name) {
+        this.coord=coordinate;
+        this.rotationX=0;
+        this.rotationY=0;
+        this.screenshot=image;
+        this.system_name=system_name;
+    }
+
+    draw_screenshot(){
+        strokeWeight(6);
+        stroke(25, 98, 85);
+        texture(this.screenshot);
+        push();
+        translate(this.coord[0], this.coord[1], this.coord[2]);
+        rotateY(this.rotationY);
+        rotateX(this.rotationX);
+        rect(0, 0, this.screenshot.width / 30, this.screenshot.height / 30);
+        resetShader();
+        fill(25, 98, 85);
+        stroke(200,98,85);
+        textSize(10);
+        text(this.system_name,0,-5);
+        pop();
+
+    }
+    randomize(){
+        this.rotationX=random(0,45);
+        this.rotationY=random(0,360);
+        for(let i=0;i<this.coord.length;i++){
+            this.coord[i]=this.coord[i]+random(-50,50);
+        }
     }
 }
 const arraysEqual = (a, b) =>
     a.length === b.length && a.every((val, index) => val === b[index]);
 
 
-systems=[]
+var systems=[];
+var loaded_screenshots=[];
 async function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
 
@@ -112,10 +118,12 @@ async function setup() {
         const screenshot_data=screenshots[i];
         const screenshot_image = await loadImage(screenshot_data[1]);
         const screenshot_coord=screenshot_data[0];
+        const screenshot_system_name=screenshot_data[2];
         for (let j = 0; j < systems.length; j++) {
             if(arraysEqual(screenshot_coord,systems[j].coord)) {
-                systems[j].add_screenshot(screenshot_image);
-                systems[j].name=screenshot_data[2];
+                let loaded_screenshot=new Screenshot(screenshot_coord,screenshot_image,screenshot_system_name);
+                loaded_screenshot.randomize();
+                loaded_screenshots.push(loaded_screenshot);
             }
         }
     }
@@ -152,6 +160,9 @@ function draw() {
     // pop();
     for (let i = 0; i < systems.length; i++) {
         systems[i].draw_system();
+    }
+    for (let i = 0; i < loaded_screenshots.length; i++) {
+        loaded_screenshots[i].draw_screenshot();
     }
 
 
