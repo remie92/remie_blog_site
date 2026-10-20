@@ -1,9 +1,6 @@
 <?php
-$directory="data";
-$events_to_save=array(
-    "Screenshot",
-    "FSDJump"
-);
+$directory = "data";
+$events_to_save = array("Screenshot", "FSDJump", "FSDTarget");
 
 $files = scandir($directory);
 
@@ -13,19 +10,16 @@ $files = array_filter($files, function ($file) {
 
 sort($files);
 
-var_dump($files);
-
-
-
 
 $db = DatabaseConnection::getInstance()->getConnection();
+
+$stmt = $db->prepare("DELETE FROM `elite_star_systems`");
+
+$stmt->execute();
+
+
 foreach ($files as $file) {
     $file = dirname(__DIR__) . '/data/' . $file;
-    $stmt = $db->prepare("SELECT * FROM `checked_elite_logs` WHERE log_name=?");
-
-    $stmt->execute([$file]);
-    $output = $stmt->fetch(PDO::FETCH_ASSOC);
-    if(!($output)){
 
     $handle = fopen($file, 'r');
 
@@ -40,9 +34,47 @@ foreach ($files as $file) {
                 continue; // Skip invalid JSON lines
             }
 
-            $stmt = $db->prepare("INSERT INTO `elite_events` (`data`) VALUES (?)");
+            if ($entry['event'] == "FSDJump") {
+                $stmt = $db->prepare("
+                    INSERT INTO elite_star_systems
+                        (SystemAddress, coordX, coordY, coordZ, name, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                        coordX = VALUES(coordX),
+                        coordY = VALUES(coordY),
+                        coordZ = VALUES(coordZ),
+                        name = VALUES(name),
+                        timestamp = VALUES(timestamp)
+                ");
 
-            $stmt->execute([$line]);
+                $stmt->execute([
+                    $entry['SystemAddress'],
+                    $entry['StarPos'][0],
+                    $entry['StarPos'][1],
+                    $entry['StarPos'][2],
+                    $entry['StarSystem'],
+                    date('Y-m-d H:i:s', strtotime($entry['timestamp']))
+                ]);
+            }
+            if ($entry['event'] == "FSDTarget") {
+                $stmt = $db->prepare("
+                    INSERT INTO elite_star_systems
+                        (SystemAddress, star_type, name, timestamp)
+                    VALUES (?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                        star_type = VALUES(star_type),
+                        name = VALUES(name),
+                        timestamp = VALUES(timestamp)
+                ");
+
+                $stmt->execute([
+                    $entry['SystemAddress'],
+                    $entry['StarClass'],
+                    $entry['Name'],
+                    date('Y-m-d H:i:s', strtotime($entry['timestamp']))
+                ]);
+            }
+
 
             echo var_dump($entry);
             echo "<br>";
@@ -54,8 +86,8 @@ foreach ($files as $file) {
     }
 
 
-    $stmt = $db->prepare("INSERT INTO `checked_elite_logs` (`log_name`) VALUES (?)");
+//    $stmt = $db->prepare("INSERT INTO `checked_elite_logs` (`log_name`) VALUES (?)");
+//
+//    $stmt->execute([$file]);
 
-    $stmt->execute([$file]);
-}
 }
