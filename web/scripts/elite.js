@@ -77,6 +77,7 @@ var startype_to_color={
 async function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
 
+
     startype_to_color={
         "O":color(160, 168, 219),
         "B":color(205, 248, 244),
@@ -196,6 +197,20 @@ function draw() {
     for (let i = 0; i < systems.length; i++) {
         systems[i].draw_system();
     }
+    stroke(195, 78, 92);
+    strokeWeight(3);
+
+    let grid_count=20;
+    for (let i=-grid_count;i<grid_count;i++){
+        line(-10000,0,100*i,10000,0,100*i);
+        line(100*i,0,-10000,100*i,0,10000);
+        if (i%2==0){
+            stroke(195, 78, 92);
+        } else{
+            stroke(215, 77, 50);
+        }
+    }
+
     // for (let i = 0; i < loaded_screenshots.length; i++) {
     //     loaded_screenshots[i].draw_screenshot();
     // }
