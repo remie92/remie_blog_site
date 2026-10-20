@@ -3,14 +3,11 @@ let screenshot;
 
 
 class System {
-    constructor(coordinate,color) {
+    constructor(coordinate,color,name,startype) {
         this.coord = coordinate;
         this.color=color;
-        this.connected_coords=[];
-        this.name="";
-    }
-    add_connected(coord) {
-        this.connected_coords.push(coord);
+        this.name=name;
+        this.startype=startype;
     }
 
     draw_system() {
@@ -21,14 +18,14 @@ class System {
         translate(this.coord[0], this.coord[1], this.coord[2]);
         box(2);
         pop();
-        strokeWeight(1);
-        for (let i=0;i<this.connected_coords.length;i++) {
-            const prev_coord = this.connected_coords[i];
-            const distance=dist(this.coord[0], this.coord[1], this.coord[2], prev_coord[0], prev_coord[1], prev_coord[2])/20;
-            let dist_val=((-1)/(distance+1))+1
-            stroke(128*dist_val, 255, 255);
-            line(this.coord[0], this.coord[1], this.coord[2], prev_coord[0], prev_coord[1], prev_coord[2]);
-        }
+        // strokeWeight(1);
+        // for (let i=0;i<this.connected_coords.length;i++) {
+        //     const prev_coord = this.connected_coords[i];
+        //     const distance=dist(this.coord[0], this.coord[1], this.coord[2], prev_coord[0], prev_coord[1], prev_coord[2])/20;
+        //     let dist_val=((-1)/(distance+1))+1
+        //     stroke(128*dist_val, 255, 255);
+        //     line(this.coord[0], this.coord[1], this.coord[2], prev_coord[0], prev_coord[1], prev_coord[2]);
+        // }
 
     }
 }
@@ -74,10 +71,66 @@ const arraysEqual = (a, b) =>
 
 var systems=[];
 var loaded_screenshots=[];
+
+var startype_to_color={
+};
 async function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
 
-
+    startype_to_color={
+        "O":color(160, 168, 219),
+        "B":color(205, 248, 244),
+        "A":color(217, 234, 248),
+        "F":color(252, 248, 229),
+        "G":color(251, 242, 211),
+        "K":color(253, 203, 114),
+        "M":color(236, 151, 84),
+        "L":color(228, 4, 25),
+        "T":color(140, 2, 92),
+        "Y":color(85, 1, 59),
+        "TTS":color(216, 0, 2),
+        "AeBe":color(219, 52, 235),
+        "W":color(219, 52, 235),
+        "WN":color(219, 52, 235),
+        "WNC":color(219, 52, 235),
+        "WC":color(219, 52, 235),
+        "WO":color(219, 52, 235),
+        "CS":color(219, 52, 235),
+        "C":color(219, 52, 235),
+        "CN":color(219, 52, 235),
+        "CJ":color(219, 52, 235),
+        "CH":color(219, 52, 235),
+        "CHd":color(219, 52, 235),
+        "MS":color(219, 52, 235),
+        "S":color(219, 52, 235),
+        "D":color(219, 52, 235),
+        "DA":color(219, 52, 235),
+        "DAB":color(219, 52, 235),
+        "DAO":color(219, 52, 235),
+        "DAZ":color(219, 52, 235),
+        "DAV":color(219, 52, 235),
+        "DB":color(219, 52, 235),
+        "DBZ":color(219, 52, 235),
+        "DBV":color(219, 52, 235),
+        "DO":color(219, 52, 235),
+        "DOV":color(219, 52, 235),
+        "DQ":color(219, 52, 235),
+        "DC":color(219, 52, 235),
+        "DCV":color(219, 52, 235),
+        "DX":color(219, 52, 235),
+        "N":color(219, 52, 235),
+        "H":color(219, 52, 235),
+        "X":color(219, 52, 235),
+        "SupermassiveBlackHole":color(219, 52, 235),
+        "A_BlueWhiteSuperGiant":color(206, 242, 249),
+        "B_BlueWhiteSuperGiant":color(217, 231, 234),
+        "F_WhiteSuperGiant":color(219, 52, 235),
+        "M_RedGiant":color(219, 52, 235),
+        "K_OrangeGiant":color(219, 52, 235),
+        "RoguePlanet":color(219, 52, 235),
+        "Nebula":color(219, 52, 235),
+        "StellarRemnantNebula":color(219, 52, 235)
+    };
 
     angleMode(DEGREES);
     colorMode(HSB, 360, 100, 100);
@@ -87,46 +140,28 @@ async function setup() {
 
 
     for (let i = 0; i < star_systems.length; i++) {
-        const coord = star_systems[i];
-        let is_new=true;
-
-        for (let j = 0; j < systems.length; j++) {
-            if(arraysEqual(coord,systems[j].coord)){
-                is_new=false;
-                let current_system=systems[j];
-                if (i > 0) {
-                    const prevCoord = star_systems[i - 1];
-                    // Only add if it's not already connected to this point
-                    if (!current_system.connected_coords.some(c => arraysEqual(c, prevCoord))) {
-                        current_system.add_connected(prevCoord);
-                    }
-                }
-            }
-        }
-        if(is_new) {
-            const col = color(lerp(startingHue, endingHue,i / star_systems.length), 28, 98);
-            let new_system = new System(coord, col);
-            if(i>0){
-                new_system.add_connected(star_systems[i-1]);
-            }
-            systems.push(new_system);
-        }
+        const star_system_data=star_systems[i];
+        const star_system_coords=star_system_data[0];
+        const star_system_name=star_system_data[1];
+        const star_system_type=star_system_data[2];
+        let star_system=new System(star_system_coords,startype_to_color[star_system_type],star_system_name,star_system_type);
+        systems.push(star_system);
     }
 
 
-    for(let i=0;i<screenshots.length;i++){
-        const screenshot_data=screenshots[i];
-        const screenshot_image = await loadImage(screenshot_data[1]);
-        const screenshot_coord=screenshot_data[0];
-        const screenshot_system_name=screenshot_data[2];
-        for (let j = 0; j < systems.length; j++) {
-            if(arraysEqual(screenshot_coord,systems[j].coord)) {
-                let loaded_screenshot=new Screenshot(screenshot_coord,screenshot_image,screenshot_system_name);
-                loaded_screenshot.randomize();
-                loaded_screenshots.push(loaded_screenshot);
-            }
-        }
-    }
+    // for(let i=0;i<screenshots.length;i++){
+    //     const screenshot_data=screenshots[i];
+    //     const screenshot_image = await loadImage(screenshot_data[1]);
+    //     const screenshot_coord=screenshot_data[0];
+    //     const screenshot_system_name=screenshot_data[2];
+    //     for (let j = 0; j < systems.length; j++) {
+    //         if(arraysEqual(screenshot_coord,systems[j].coord)) {
+    //             let loaded_screenshot=new Screenshot(screenshot_coord,screenshot_image,screenshot_system_name);
+    //             loaded_screenshot.randomize();
+    //             loaded_screenshots.push(loaded_screenshot);
+    //         }
+    //     }
+    // }
 
     font = await loadFont('/web/font/ShareTech-Regular.ttf');
     textFont(font);
@@ -161,9 +196,9 @@ function draw() {
     for (let i = 0; i < systems.length; i++) {
         systems[i].draw_system();
     }
-    for (let i = 0; i < loaded_screenshots.length; i++) {
-        loaded_screenshots[i].draw_screenshot();
-    }
+    // for (let i = 0; i < loaded_screenshots.length; i++) {
+    //     loaded_screenshots[i].draw_screenshot();
+    // }
 
 
     pop();
