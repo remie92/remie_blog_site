@@ -1,8 +1,7 @@
+
 # The site!
 
-It will eventually run on remie.dev
+It runs on [remie.dev](remie.dev)!
 
-I already bought the domain, just need to figure out how to the fancy DNS thingies
+Currently, the only really functional page is the [remie.dev/elite](remie.dev/elite) page. There's a non-functional homepage too. Gotta make a pretty one! (CSS is the bane of my existence though)
 
-
-please, don't look at the stuff mentioning "recepten". that's dutch for recipes and was just me testing around with inserting stuff into sql databases, will be removing those soon.
