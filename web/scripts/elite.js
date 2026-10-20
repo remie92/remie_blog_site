@@ -208,19 +208,7 @@ function draw() {
     for (let i = 0; i < loaded_screenshots.length; i++) {
         loaded_screenshots[i].draw_screenshot();
     }
-    stroke(195, 78, 92);
-    strokeWeight(3);
 
-    let grid_count=20;
-    for (let i=-grid_count;i<grid_count;i++){
-        line(-10000,0,100*i,10000,0,100*i);
-        line(100*i,0,-10000,100*i,0,10000);
-        if (i%2==0){
-            stroke(195, 78, 92);
-        } else{
-            stroke(215, 77, 50);
-        }
-    }
 
 
 
@@ -237,6 +225,21 @@ function draw() {
     line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX,cam.centerY-40,cam.centerZ);
     stroke(246, 75, 72);
     line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX,cam.centerY,cam.centerZ+40);
+
+
+    stroke(195, 78, 92);
+    strokeWeight(3);
+
+    let grid_count=20;
+    for (let i=-grid_count;i<grid_count;i++){
+        line(-40000+(floor(cam.centerX/800)*800),0,400*i+(floor(cam.centerZ/800)*800),40000+(floor(cam.centerX/800)*800),0,400*i+(floor(cam.centerZ/800)*800));
+        line(400*i+(floor(cam.centerX/800)*800),0,-40000+(floor(cam.centerZ/800)*800),400*i+(floor(cam.centerX/800)*800),0,40000+(floor(cam.centerZ/800)*800));
+        if (i%2==0){
+            stroke(195, 78, 92);
+        } else{
+            stroke(215, 77, 50);
+        }
+    }
 }
 
 function windowResized() {
