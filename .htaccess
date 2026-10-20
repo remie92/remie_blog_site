@@ -1,0 +1,10 @@
+RewriteEngine On
+
+Options -Indexes
+
+#RewriteCond %{REQUEST_URI} !/cms_update/
+#RewriteCond %{REQUEST_URI} !/vendor/
+#RewriteCond %{REQUEST_URI} !/tmp/upload/
+RewriteCond %{REQUEST_URI} !robots.txt
+RewriteCond %{REQUEST_URI} !/web/
+RewriteRule ^ routing.php [L]
