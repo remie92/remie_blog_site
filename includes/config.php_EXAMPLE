@@ -1,0 +1,8 @@
+<?php
+define('DB_HOST','ADRESS');
+define('DB_USER','USER NAME');
+define('DB_PASS','DATABASE PASSWORD');
+define('DB_NAME','DATABASE NAME');
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
