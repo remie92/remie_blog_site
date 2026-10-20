@@ -41,6 +41,14 @@ class Screenshot{
     }
 
     draw_screenshot(){
+        let cam = p5.instance._renderer.mainCamera
+
+        let pos = cam.eyeX;
+        let posY = cam.eyeY;
+        let posZ = cam.eyeZ;
+
+        let dist_to_cam=dist(this.coord[0]*4, this.coord[1]*4, this.coord[2]*4,cam.eyeX,cam.eyeY,cam.eyeZ);
+        dist_to_cam=dist_to_cam/12;
         strokeWeight(6);
         stroke(25, 98, 85);
         texture(this.screenshot);
@@ -48,11 +56,11 @@ class Screenshot{
         translate(this.coord[0], this.coord[1], this.coord[2]);
         rotateY(this.rotationY);
         rotateX(this.rotationX);
-        rect(0, 0, this.screenshot.width / 30, this.screenshot.height / 30);
+        rect(0, 0, this.screenshot.width / dist_to_cam, this.screenshot.height / dist_to_cam);
         resetShader();
         fill(25, 98, 85);
         stroke(200,98,85);
-        textSize(10);
+        textSize(7);
         text(this.system_name,0,-5);
         pop();
 
@@ -150,19 +158,19 @@ async function setup() {
     }
 
 
-    // for(let i=0;i<screenshots.length;i++){
-    //     const screenshot_data=screenshots[i];
-    //     const screenshot_image = await loadImage(screenshot_data[1]);
-    //     const screenshot_coord=screenshot_data[0];
-    //     const screenshot_system_name=screenshot_data[2];
-    //     for (let j = 0; j < systems.length; j++) {
-    //         if(arraysEqual(screenshot_coord,systems[j].coord)) {
-    //             let loaded_screenshot=new Screenshot(screenshot_coord,screenshot_image,screenshot_system_name);
-    //             loaded_screenshot.randomize();
-    //             loaded_screenshots.push(loaded_screenshot);
-    //         }
-    //     }
-    // }
+    for(let i=0;i<screenshots.length;i++){
+        const screenshot_data=screenshots[i];
+        const screenshot_image = await loadImage(screenshot_data[2]);
+        const screenshot_coord=screenshot_data[0];
+        const screenshot_system_name=screenshot_data[1];
+        for (let j = 0; j < systems.length; j++) {
+            if(arraysEqual(screenshot_coord,systems[j].coord)) {
+                let loaded_screenshot=new Screenshot(screenshot_coord,screenshot_image,screenshot_system_name);
+                loaded_screenshot.randomize();
+                loaded_screenshots.push(loaded_screenshot);
+            }
+        }
+    }
 
     font = await loadFont('/web/font/ShareTech-Regular.ttf');
     textFont(font);
@@ -197,6 +205,9 @@ function draw() {
     for (let i = 0; i < systems.length; i++) {
         systems[i].draw_system();
     }
+    for (let i = 0; i < loaded_screenshots.length; i++) {
+        loaded_screenshots[i].draw_screenshot();
+    }
     stroke(195, 78, 92);
     strokeWeight(3);
 
@@ -211,12 +222,21 @@ function draw() {
         }
     }
 
-    // for (let i = 0; i < loaded_screenshots.length; i++) {
-    //     loaded_screenshots[i].draw_screenshot();
-    // }
+
+
+
 
 
     pop();
+
+    let cam = p5.instance._renderer.mainCamera
+    strokeWeight(7);
+    stroke(0, 75, 72);
+    line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX+40,cam.centerY,cam.centerZ);
+    stroke(119, 75, 72);
+    line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX,cam.centerY-40,cam.centerZ);
+    stroke(246, 75, 72);
+    line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX,cam.centerY,cam.centerZ+40);
 }
 
 function windowResized() {

@@ -26,6 +26,11 @@ $stmt = $db->prepare("SELECT * FROM `elite_star_systems`");
 $stmt->execute();
 $star_system_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+$stmt = $db->prepare("SELECT * FROM `elite_screenshots`");
+
+$stmt->execute();
+$screenshot_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 function coordinateToString($coordinate) {
     return "[".$coordinate[0].",".$coordinate[1].",".$coordinate[2]."]";
@@ -51,6 +56,13 @@ foreach ($star_system_data as $star_system) {
         $star_system_type = $star_system['star_type'];
         array_push($system_data_export, [$current_pos, $star_system_name, $star_system_type]);
     }
+}
+
+foreach ($screenshot_data as $screenshot) {
+    $current_pos = [$screenshot['coordX'], $screenshot['coordY'], $screenshot['coordZ']];
+    $star_system_name = $screenshot['system_name'];
+    $screenshot_url = $screenshot['url'];
+    array_push($screenshots, [$current_pos, $star_system_name, $screenshot_url]);
 }
 
 //foreach ($output as $event){
@@ -82,7 +94,7 @@ foreach ($star_system_data as $star_system) {
     // json_encode safely translates PHP arrays/objects directly into JavaScript syntax
     const star_systems = <?php echo json_encode($system_data_export); ?>;
     const screenshots = <?php echo json_encode($screenshots); ?>;
-    console.log(star_systems);
+    console.log(screenshots);
 </script>
 
 <script src="/web/scripts/elite.js"></script>

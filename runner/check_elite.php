@@ -14,8 +14,23 @@ sort($files);
 $db = DatabaseConnection::getInstance()->getConnection();
 
 $stmt = $db->prepare("DELETE FROM `elite_star_systems`");
+$stmt = $db->prepare("DELETE FROM `elite_screenshots`");
 
 $stmt->execute();
+
+$last_position=array(0,0,0);
+
+
+function convertScreenshotPath(string $path, bool $thumbnail = false): string
+{
+    $filename = basename(str_replace('\\', '/', $path));
+
+    $filename = preg_replace('/\.bmp$/i', '.webp', $filename);
+
+    $directory = $thumbnail ? 'converted_thumbnail' : 'converted';
+
+    return "/web/images/elite_screenshots/{$directory}/{$filename}";
+}
 
 
 foreach ($files as $file) {
@@ -55,6 +70,7 @@ foreach ($files as $file) {
                     $entry['StarSystem'],
                     date('Y-m-d H:i:s', strtotime($entry['timestamp']))
                 ]);
+                $last_position=array($entry['StarPos'][0],$entry['StarPos'][1],$entry['StarPos'][2]);
             }
             if ($entry['event'] == "FSDTarget") {
                 $stmt = $db->prepare("
@@ -71,6 +87,23 @@ foreach ($files as $file) {
                     $entry['SystemAddress'],
                     $entry['StarClass'],
                     $entry['Name'],
+                    date('Y-m-d H:i:s', strtotime($entry['timestamp']))
+                ]);
+            }
+
+            if ($entry['event'] == "Screenshot") {
+                $stmt = $db->prepare("
+                    INSERT INTO elite_screenshots
+                        (url, coordX, coordY, coordZ, system_name, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ");
+
+                $stmt->execute([
+                    convertScreenshotPath($entry["Filename"],true),
+                    $last_position[0],
+                    $last_position[1],
+                    $last_position[2],
+                    $entry['System'],
                     date('Y-m-d H:i:s', strtotime($entry['timestamp']))
                 ]);
             }
