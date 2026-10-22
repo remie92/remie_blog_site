@@ -1,6 +1,7 @@
 <?php
-$username = isset($_POST["name"]) ?? $_POST["name"];
-$password = isset($_POST["password"]) ?? $_POST["password"];
+$username = $_POST["name"];
+$password = $_POST["password"];
+$hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 $db = DatabaseConnection::getInstance()->getConnection();
 
