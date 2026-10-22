@@ -54,7 +54,9 @@ foreach ($star_system_data as $star_system) {
         $current_pos = [$star_system['coordX'], $star_system['coordY'], $star_system['coordZ']];
         $star_system_name = $star_system['name'];
         $star_system_type = $star_system['star_type'];
-        array_push($system_data_export, [$current_pos, $star_system_name, $star_system_type]);
+        $star_system_allegiance= $star_system['allegiance'];
+        $star_system_population= $star_system['population'];
+        array_push($system_data_export, [$current_pos, $star_system_name, $star_system_type, $star_system_allegiance, $star_system_population]);
     }
 }
 
@@ -94,7 +96,7 @@ foreach ($screenshot_data as $screenshot) {
     // json_encode safely translates PHP arrays/objects directly into JavaScript syntax
     const star_systems = <?php echo json_encode($system_data_export); ?>;
     const screenshots = <?php echo json_encode($screenshots); ?>;
-    console.log(screenshots);
+    console.log(star_systems);
 </script>
 
 <script src="/web/scripts/elite.js"></script>
