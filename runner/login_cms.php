@@ -1,7 +1,6 @@
 <?php
 $username = $_POST["name"];
 $password = $_POST["password"];
-$hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 $db = DatabaseConnection::getInstance()->getConnection();
 
