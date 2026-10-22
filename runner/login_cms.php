@@ -11,7 +11,7 @@ $stmt->execute([$username]);
 
 $found_account=$stmt->fetch();
 
-if ($found_account) {
+if ($found_account&&is_string($username)&&is_string($password)) {
     if (password_verify($password, $found_account['password_hash'])) {
         $_SESSION['username'] = $found_account['username'];
         $_SESSION["logged_in"]=true;
