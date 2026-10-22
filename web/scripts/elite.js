@@ -3,11 +3,13 @@ let screenshot;
 
 
 class System {
-    constructor(coordinate,color,name,startype) {
+    constructor(coordinate,color,name,startype,allegiance,population) {
         this.coord = coordinate;
         this.color=color;
         this.name=name;
         this.startype=startype;
+        this.allegiance=allegiance;
+        this.population=population;
     }
 
     draw_system() {
@@ -153,7 +155,9 @@ async function setup() {
         const star_system_coords=star_system_data[0];
         const star_system_name=star_system_data[1];
         const star_system_type=star_system_data[2];
-        let star_system=new System(star_system_coords,startype_to_color[star_system_type],star_system_name,star_system_type);
+        const star_system_allegiance=star_system_data[3];
+        const star_system_population=star_system_data[4];
+        let star_system=new System(star_system_coords,startype_to_color[star_system_type],star_system_name,star_system_type,star_system_allegiance,star_system_population);
         systems.push(star_system);
     }
 
