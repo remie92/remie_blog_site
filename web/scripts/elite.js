@@ -10,15 +10,18 @@ class System {
         this.startype=startype;
         this.allegiance=allegiance;
         this.population=population;
+        this.box_size= ((-1) / ((this.population + 50000000) * 0.00000001)) + 3;
     }
 
     draw_system() {
 
         fill(this.color);
+        // strokeWeight(0.5);
+        // stroke(189, 81, 95);
         noStroke();
         push();
         translate(this.coord[0], this.coord[1], this.coord[2]);
-        box(2);
+        box(this.box_size);
         pop();
         // strokeWeight(1);
         // for (let i=0;i<this.connected_coords.length;i++) {
