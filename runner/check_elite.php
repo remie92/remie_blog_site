@@ -52,14 +52,16 @@ foreach ($files as $file) {
             if ($entry['event'] == "FSDJump") {
                 $stmt = $db->prepare("
                     INSERT INTO elite_star_systems
-                        (SystemAddress, coordX, coordY, coordZ, name, timestamp)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                        (SystemAddress, coordX, coordY, coordZ, name, timestamp,allegiance,population)
+                    VALUES (?, ?, ?, ?, ?, ?,?,?)
                     ON DUPLICATE KEY UPDATE
                         coordX = VALUES(coordX),
                         coordY = VALUES(coordY),
                         coordZ = VALUES(coordZ),
                         name = VALUES(name),
-                        timestamp = VALUES(timestamp)
+                        timestamp = VALUES(timestamp),
+                        allegiance = VALUES(allegiance),
+                        population = VALUES(population)
                 ");
 
                 $stmt->execute([
@@ -68,7 +70,9 @@ foreach ($files as $file) {
                     $entry['StarPos'][1],
                     $entry['StarPos'][2],
                     $entry['StarSystem'],
-                    date('Y-m-d H:i:s', strtotime($entry['timestamp']))
+                    date('Y-m-d H:i:s', strtotime($entry['timestamp'])),
+                    $entry['SystemAllegiance'],
+                    $entry['Population']
                 ]);
                 $last_position=array($entry['StarPos'][0],$entry['StarPos'][1],$entry['StarPos'][2]);
             }
