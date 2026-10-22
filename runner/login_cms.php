@@ -1,6 +1,6 @@
 <?php
-$username = $_POST["name"];
-$password = $_POST["password"];
+$username = isset($_POST["name"]) ?? $_POST["name"];
+$password = isset($_POST["password"]) ?? $_POST["password"];
 
 $db = DatabaseConnection::getInstance()->getConnection();
 
