@@ -166,7 +166,9 @@ async function setup() {
 
     for (let i = 0; i < star_systems.length; i++) {
         const star_system_data=star_systems[i];
-        const star_system_coords=star_system_data[0];
+        let star_system_coords=star_system_data[0];
+        star_system_coords[0]*=-1;
+        star_system_coords[1]*=-1;
         const star_system_name=star_system_data[1];
         const star_system_type=star_system_data[2];
         const star_system_allegiance=star_system_data[3];
@@ -179,7 +181,9 @@ async function setup() {
     for(let i=0;i<screenshots.length;i++){
         const screenshot_data=screenshots[i];
         const screenshot_image = await loadImage(screenshot_data[2]);
-        const screenshot_coord=screenshot_data[0];
+        let screenshot_coord=screenshot_data[0];
+        screenshot_coord[0]*=-1;
+        screenshot_coord[1]*=-1;
         const screenshot_system_name=screenshot_data[1];
         for (let j = 0; j < systems.length; j++) {
             if(arraysEqual(screenshot_coord,systems[j].coord)) {
