@@ -3,12 +3,20 @@ let screenshot;
 
 
 class System {
-    constructor(coordinate,color,name,startype,allegiance,population) {
+    constructor(coordinate,star_color,name,startype,allegiance,population) {
         this.coord = coordinate;
-        this.color=color;
+        this.color=star_color;
         this.name=name;
         this.startype=startype;
         this.allegiance=allegiance;
+        this.allegiance_color=null;
+        // if (this.allegiance==="Empire"){
+        //     this.allegiance_color=color(189, 81, 95);
+        // }else if (this.allegiance==="Federation"){
+        //     this.allegiance_color=color(0, 72, 81);
+        // }else if (this.allegiance==="Alliance"){
+        //     this.allegiance_color=color(119, 84, 41);
+        // }
         this.population=population;
         this.box_size= ((-1) / ((this.population + 50000000) * 0.00000001)) + 3;
     }
@@ -16,9 +24,12 @@ class System {
     draw_system() {
 
         fill(this.color);
-        // strokeWeight(0.5);
-        // stroke(189, 81, 95);
-        noStroke();
+        //if(this.allegiance_color==null){
+            noStroke();
+        // } else {
+        //     strokeWeight(0.5);
+        //     stroke(this.allegiance_color);
+        // }
         push();
         translate(this.coord[0], this.coord[1], this.coord[2]);
         box(this.box_size);
