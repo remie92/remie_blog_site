@@ -98,6 +98,16 @@ var loaded_screenshots=[];
 
 var startype_to_color={
 };
+
+function applyProjection() {
+    let cam = p5.instance._renderer.mainCamera;
+    let fov = 60;                      // degrees (you use angleMode(DEGREES))
+    let aspect = width / height;
+    let near = 0.1;
+    let far = 1000000;                 // pick whatever you need
+    cam.perspective(fov, aspect, near, far);
+}
+
 async function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
 
@@ -204,10 +214,15 @@ endingHue=360;
 
 var seconds = new Date().getTime() / 1000;
 
+
+
+
 function draw() {
+    applyProjection();
     if (frameCount % 60 == 0) {
         console.log("Framerate:", frameRate())
     }
+
 
 
     seconds = new Date().getTime() / 1000;
@@ -253,9 +268,10 @@ function draw() {
     strokeWeight(3);
 
     let grid_count=20;
+    let grid_line_length=8000;
     for (let i=-grid_count;i<grid_count;i++){
-        line(-40000+(floor(cam.centerX/800)*800),0,400*i+(floor(cam.centerZ/800)*800),40000+(floor(cam.centerX/800)*800),0,400*i+(floor(cam.centerZ/800)*800));
-        line(400*i+(floor(cam.centerX/800)*800),0,-40000+(floor(cam.centerZ/800)*800),400*i+(floor(cam.centerX/800)*800),0,40000+(floor(cam.centerZ/800)*800));
+        line(-grid_line_length+(floor(cam.centerX/800)*800),0,400*i+(floor(cam.centerZ/800)*800),grid_line_length+(floor(cam.centerX/800)*800),0,400*i+(floor(cam.centerZ/800)*800));
+        line(400*i+(floor(cam.centerX/800)*800),0,-grid_line_length+(floor(cam.centerZ/800)*800),400*i+(floor(cam.centerX/800)*800),0,grid_line_length+(floor(cam.centerZ/800)*800));
         if (i%2==0){
             stroke(195, 78, 92);
         } else{

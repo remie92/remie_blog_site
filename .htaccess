@@ -8,4 +8,5 @@ Options -Indexes
 RewriteCond %{REQUEST_URI} !^/robots\.txt$
 RewriteCond %{REQUEST_URI} !^/web/
 RewriteCond %{REQUEST_URI} !^/favicon\.ico$
+RewriteCond %{REQUEST_URI} !^/sitemap\.txt$
 RewriteRule ^ routing.php [L]
