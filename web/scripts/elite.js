@@ -1,3 +1,12 @@
+/*
+HEYYY
+WHAT ARE YOU DOING HERE
+THIS IS THE CODE DRAWING STUFF TO THE SCREEN
+please don't look, it's so bad lmao. This is my first real time working in javascript so I dunno much about proper syntax/formatting/stuff
+ */
+
+
+
 let screenshot;
 
 
@@ -54,45 +63,133 @@ class Screenshot{
         this.rotationY=0;
         this.screenshot=image;
         this.system_name=system_name;
+        this.system_coord=coordinate.slice();
     }
 
-    draw_screenshot(){
+    draw_screenshot(index){
+        if((focusMode&&index===prev_closest_index)||focusMode==false) {
+            let cam = p5.instance._renderer.mainCamera
+
+            let pos = cam.eyeX;
+            let posY = cam.eyeY;
+            let posZ = cam.eyeZ;
+
+            let dist_to_cam = dist(this.coord[0], this.coord[1], this.coord[2], cam.eyeX, cam.eyeY, cam.eyeZ);
+
+            if (dist_to_cam < 1250) {
+                if (focusMode === false) {
+                    let dist_to_center = dist(this.coord[0], this.coord[1], this.coord[2], (cam.eyeX + cam.centerX) / 2, (cam.eyeY + cam.centerY) / 2, (cam.eyeZ + cam.centerZ) / 2);
+                    if (dist_to_center < curr_closest_dist) {
+                        curr_closest_dist = dist_to_center;
+                        curr_closest_index = index;
+
+                    }
+                }
+                dist_to_cam = dist_to_cam / 3;
+                strokeWeight(1.5);
+                if (prev_closest_index === index) {
+                    stroke(40, 100, 100);
+                } else {
+                    stroke(25, 98, 85);
+                }
+                if (dist_to_cam < 200) {
+                    texture(this.screenshot);
+                } else {
+                    fill(25, 98, 85);
+                }
+                push();
+                translate(this.coord[0], this.coord[1], this.coord[2]);
+                rotateY(this.rotationY);
+                rotateX(this.rotationX);
+                rect(0, 0, this.screenshot.width / dist_to_cam, this.screenshot.height / dist_to_cam);
+                resetShader();
+                if (dist_to_cam < 50) {
+                    fill(25, 98, 85);
+                    stroke(200, 98, 85);
+                    textSize(130 / dist_to_cam);
+                    text(this.system_name, 0, -5);
+                    if (focusMode && index === prev_closest_index) {
+                        text("Image:", -20, +20);
+                        text(index + 1, -20, +30);
+                    }
+                }
+                pop();
+            }
+        }
+    }
+    randomize(){
+        let at_nice_spot=false;
+        let random_distance=20;
+        const old_coord=this.coord.slice();
+        while (at_nice_spot===false) {
+            at_nice_spot=true;
+            // this.rotationX = random(0, 45);
+            // this.rotationY = random(-30, 30);
+            for (let i = 0; i < old_coord.length; i++) {
+                this.coord[i] = old_coord[i] + random(-random_distance,random_distance);
+            }
+            for (let i = 0; i < loaded_screenshots.length; i++) {
+                const coordcheck=loaded_screenshots[i].coord;
+                if (60>dist(this.coord[0], this.coord[1], this.coord[2],coordcheck[0],coordcheck[1],coordcheck[2])){
+                    at_nice_spot=false;
+                }
+            }
+            for (let i = 0; i < systems.length; i++) {
+                const coordcheck=systems[i].coord;
+                if (30>dist(this.coord[0], this.coord[1], this.coord[2],coordcheck[0],coordcheck[1],coordcheck[2])){
+                    at_nice_spot=false;
+                }
+            }
+            random_distance+=5;
+        }
+    }
+}
+
+function focusScreenshot(screenshot) {
+
+    let cam = p5.instance._renderer.mainCamera;
+
+    let target = createVector(screenshot.coord[0],screenshot.coord[1],screenshot.coord[2]);
+
+    // Set the orbit target to the screenshot's position.
+    cam.setPosition(target.x+31,target.y+15,target.z+50);
+    cam.lookAt(
+        target.x+31,target.y+15,target.z-15
+    );
+    focusMode=true;
+}
+
+
+class jump_route{
+    constructor(coord1,coord2,amount) {
+        this.coord1=coord1;
+        this.coord2=coord2;
+        this.amount=sqrt(amount)/4;
+        this.length=dist(this.coord1[0],this.coord1[1],this.coord1[2],this.coord2[0],this.coord2[1],this.coord2[2]);
+        this.col=color(((3000 / (dist(this.coord1[0],this.coord1[1],this.coord1[2],this.coord2[0],this.coord2[1],this.coord2[2]) + 33)) + 100), 28, (80 + (1 / (-(amount + 1) / 100))));
+    }
+
+    draw_jump() {
         let cam = p5.instance._renderer.mainCamera
 
         let pos = cam.eyeX;
         let posY = cam.eyeY;
         let posZ = cam.eyeZ;
 
-        let dist_to_cam=dist(this.coord[0]*4, this.coord[1]*4, this.coord[2]*4,cam.eyeX,cam.eyeY,cam.eyeZ);
-        dist_to_cam=dist_to_cam/12;
-        strokeWeight(6);
-        stroke(25, 98, 85);
-        texture(this.screenshot);
-        push();
-        translate(this.coord[0], this.coord[1], this.coord[2]);
-        rotateY(this.rotationY);
-        rotateX(this.rotationX);
-        rect(0, 0, this.screenshot.width / dist_to_cam, this.screenshot.height / dist_to_cam);
-        resetShader();
-        fill(25, 98, 85);
-        stroke(200,98,85);
-        textSize(7);
-        text(this.system_name,0,-5);
-        pop();
+        let dist_to_cam=dist(this.coord1[0], this.coord1[1], this.coord1[2],cam.eyeX,cam.eyeY,cam.eyeZ);
+        if(dist_to_cam<this.length*8) {
+            strokeWeight(this.amount);
+            stroke(this.col);
+            line(this.coord1[0], this.coord1[1], this.coord1[2], this.coord2[0], this.coord2[1], this.coord2[2]);
+        }
 
     }
-    randomize(){
-        this.rotationX=random(0,45);
-        this.rotationY=random(-30,30);
-        for(let i=0;i<this.coord.length;i++){
-            this.coord[i]=this.coord[i]+random(-80,80);
-        }
-    }
 }
+
 const arraysEqual = (a, b) =>
     a.length === b.length && a.every((val, index) => val === b[index]);
 
-
+var jumps=[];
 var systems=[];
 var loaded_screenshots=[];
 
@@ -110,6 +207,13 @@ function applyProjection() {
 
 async function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
+    setTimeout(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight-20,
+            behavior: 'smooth'
+        });
+
+    }, 3000);
 
 
     startype_to_color={
@@ -124,47 +228,47 @@ async function setup() {
         "T":color(140, 2, 92),
         "Y":color(85, 1, 59),
         "TTS":color(216, 0, 2),
-        "AeBe":color(219, 52, 235),
-        "W":color(219, 52, 235),
-        "WN":color(219, 52, 235),
-        "WNC":color(219, 52, 235),
-        "WC":color(219, 52, 235),
-        "WO":color(219, 52, 235),
-        "CS":color(219, 52, 235),
-        "C":color(219, 52, 235),
-        "CN":color(219, 52, 235),
-        "CJ":color(219, 52, 235),
-        "CH":color(219, 52, 235),
-        "CHd":color(219, 52, 235),
-        "MS":color(219, 52, 235),
-        "S":color(219, 52, 235),
-        "D":color(219, 52, 235),
-        "DA":color(219, 52, 235),
-        "DAB":color(219, 52, 235),
-        "DAO":color(219, 52, 235),
-        "DAZ":color(219, 52, 235),
-        "DAV":color(219, 52, 235),
-        "DB":color(219, 52, 235),
-        "DBZ":color(219, 52, 235),
-        "DBV":color(219, 52, 235),
-        "DO":color(219, 52, 235),
-        "DOV":color(219, 52, 235),
-        "DQ":color(219, 52, 235),
-        "DC":color(219, 52, 235),
-        "DCV":color(219, 52, 235),
-        "DX":color(219, 52, 235),
-        "N":color(219, 52, 235),
-        "H":color(219, 52, 235),
-        "X":color(219, 52, 235),
-        "SupermassiveBlackHole":color(219, 52, 235),
+        "AeBe":color(0,0,0),
+        "W":color(0,0,0),
+        "WN":color(0,0,0),
+        "WNC":color(0,0,0),
+        "WC":color(0,0,0),
+        "WO":color(0,0,0),
+        "CS":color(0,0,0),
+        "C":color(0,0,0),
+        "CN":color(0,0,0),
+        "CJ":color(0,0,0),
+        "CH":color(0,0,0),
+        "CHd":color(0,0,0),
+        "MS":color(0,0,0),
+        "S":color(0,0,0),
+        "D":color(0,0,0),
+        "DA":color(0,0,0),
+        "DAB":color(0,0,0),
+        "DAO":color(0,0,0),
+        "DAZ":color(0,0,0),
+        "DAV":color(0,0,0),
+        "DB":color(0,0,0),
+        "DBZ":color(0,0,0),
+        "DBV":color(0,0,0),
+        "DO":color(0,0,0),
+        "DOV":color(0,0,0),
+        "DQ":color(225, 250, 252),
+        "DC":color(0,0,0),
+        "DCV":color(0,0,0),
+        "DX":color(0,0,0),
+        "N":color(0,0,0),
+        "H":color(0,0,0),
+        "X":color(0,0,0),
+        "SupermassiveBlackHole":color(0,0,0),
         "A_BlueWhiteSuperGiant":color(206, 242, 249),
         "B_BlueWhiteSuperGiant":color(217, 231, 234),
-        "F_WhiteSuperGiant":color(219, 52, 235),
-        "M_RedGiant":color(219, 52, 235),
-        "K_OrangeGiant":color(219, 52, 235),
-        "RoguePlanet":color(219, 52, 235),
-        "Nebula":color(219, 52, 235),
-        "StellarRemnantNebula":color(219, 52, 235)
+        "F_WhiteSuperGiant":color(0,0,0),
+        "M_RedGiant":color(0,0,0),
+        "K_OrangeGiant":color(0,0,0),
+        "RoguePlanet":color(0,0,0),
+        "Nebula":color(0,0,0),
+        "StellarRemnantNebula":color(0,0,0)
     };
 
     angleMode(DEGREES);
@@ -204,6 +308,19 @@ async function setup() {
         }
     }
 
+    for(let i=0;i<jump_routes.length;i++){
+        const jump_data=jump_routes[i];
+        let  pos1=jump_data[0];
+        let pos2=jump_data[1];
+        pos1[0]*=-1;
+        pos1[1]*=-1;
+        pos2[0]*=-1;
+        pos2[1]*=-1;
+        const amount=jump_data[2];
+        let jump=new jump_route(pos1,pos2,amount);
+        jumps.push(jump);
+    }
+
     font = await loadFont('/web/font/ShareTech-Regular.ttf');
     textFont(font);
 
@@ -215,12 +332,16 @@ endingHue=360;
 var seconds = new Date().getTime() / 1000;
 
 
-
+var prev_closest_index=0;
+var curr_closest_index=0;
+var curr_closest_dist=99999999;
 
 function draw() {
+    let cam = p5.instance._renderer.mainCamera
     applyProjection();
     if (frameCount % 60 == 0) {
         console.log("Framerate:", frameRate())
+        //cam.lookAt(100,50,50);
     }
 
 
@@ -233,53 +354,92 @@ function draw() {
     orbitControl();
 
     push();
-    scale(4);
     // texture(screenshot);
     // push();
     // rotateX(40);
     // rect(40,70,screenshot.width/20,screenshot.height/20);
     // pop();
-    for (let i = 0; i < systems.length; i++) {
-        systems[i].draw_system();
+
+    //let a=millis();
+    if(focusMode===false) {
+        for (let i = 0; i < systems.length; i++) {
+            systems[i].draw_system();
+        }
+    }
+    // print("Systems",millis()-a);
+    // a=millis();
+    if(focusMode===false){
+    prev_closest_index=curr_closest_index;
+    curr_closest_index=0;
+    curr_closest_dist=99999999;
     }
     for (let i = 0; i < loaded_screenshots.length; i++) {
-        loaded_screenshots[i].draw_screenshot();
+        loaded_screenshots[i].draw_screenshot(i);
     }
-
-
-
-
-
-
-
+    // print("Screenshots",millis()-a);
+    // a=millis();
+    if(focusMode===false) {
+        for (let i = 0; i < jumps.length; i++) {
+            jumps[i].draw_jump();
+        }
+    }
+    // print("Jumps",millis()-a);
+    // a=millis();
     pop();
 
-    let cam = p5.instance._renderer.mainCamera
-    strokeWeight(7);
+
+    strokeWeight(1);
     stroke(0, 75, 72);
-    line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX+40,cam.centerY,cam.centerZ);
+    line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX+5,cam.centerY,cam.centerZ);
     stroke(119, 75, 72);
-    line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX,cam.centerY-40,cam.centerZ);
+    line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX,cam.centerY-5,cam.centerZ);
     stroke(246, 75, 72);
-    line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX,cam.centerY,cam.centerZ+40);
+    line(cam.centerX,cam.centerY,cam.centerZ,cam.centerX,cam.centerY,cam.centerZ+5);
 
 
     stroke(195, 78, 92);
-    strokeWeight(3);
+    strokeWeight(0.7);
 
     let grid_count=20;
-    let grid_line_length=8000;
+    let grid_line_length=2000;
     for (let i=-grid_count;i<grid_count;i++){
-        line(-grid_line_length+(floor(cam.centerX/800)*800),0,400*i+(floor(cam.centerZ/800)*800),grid_line_length+(floor(cam.centerX/800)*800),0,400*i+(floor(cam.centerZ/800)*800));
-        line(400*i+(floor(cam.centerX/800)*800),0,-grid_line_length+(floor(cam.centerZ/800)*800),400*i+(floor(cam.centerX/800)*800),0,grid_line_length+(floor(cam.centerZ/800)*800));
+        line(-grid_line_length+(floor(cam.centerX/200)*200),0,100*i+(floor(cam.centerZ/200)*200),grid_line_length+(floor(cam.centerX/200)*200),0,100*i+(floor(cam.centerZ/200)*200));
+        line(100*i+(floor(cam.centerX/200)*200),0,-grid_line_length+(floor(cam.centerZ/200)*200),100*i+(floor(cam.centerX/200)*200),0,grid_line_length+(floor(cam.centerZ/200)*200));
         if (i%2==0){
             stroke(195, 78, 92);
         } else{
             stroke(215, 77, 50);
         }
     }
+    //print("Grid",millis()-a);
 }
 
 function windowResized() {
     resizeCanvas(window.innerWidth, window.innerHeight);
+}
+
+
+var focusMode=false;
+
+function mousePressed(){
+    focusMode = false;
+}
+
+function mouseWheel(){
+    focusMode = false;
+}
+
+function keyPressed(){
+    if(key==='f'){
+        focusScreenshot(loaded_screenshots[prev_closest_index]);
+    }
+    if(key==='a'){
+        prev_closest_index-=1;
+        focusScreenshot(loaded_screenshots[prev_closest_index]);
+    }
+    if(key==='d'){
+        prev_closest_index+=1;
+        focusScreenshot(loaded_screenshots[prev_closest_index]);
+    }
+
 }

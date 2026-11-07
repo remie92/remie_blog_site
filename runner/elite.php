@@ -6,10 +6,11 @@
 
 
 <?php
-//require 'views/elite.php';
+require 'views/elite.php';
 
 $system_data_export = [];
 $screenshots=[];
+$jump_routes=[];
 //var_dump($funky);
 //
 //if(in_array([0,0,8],$funky)){
@@ -30,6 +31,12 @@ $stmt = $db->prepare("SELECT * FROM `elite_screenshots`");
 
 $stmt->execute();
 $screenshot_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt = $db->prepare("SELECT * FROM `elite_jump_routes`");
+
+$stmt->execute();
+$jump_route_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 
 function coordinateToString($coordinate) {
@@ -67,6 +74,12 @@ foreach ($screenshot_data as $screenshot) {
     array_push($screenshots, [$current_pos, $star_system_name, $screenshot_url]);
 }
 
+foreach ($jump_route_data as $jump_route) {
+    $pos1 = [$jump_route['coordX1'], $jump_route['coordY1'], $jump_route['coordZ1']];
+    $pos2 = [$jump_route['coordX2'], $jump_route['coordY2'], $jump_route['coordZ2']];
+    $amount=$jump_route['jump_amount'];
+    array_push($jump_routes, [$pos1, $pos2, $amount]);
+}
 //foreach ($output as $event){
 //    $entry = json_decode($event["data"], true);
 //    if ($entry["event"] == "FSDJump"){
@@ -96,7 +109,8 @@ foreach ($screenshot_data as $screenshot) {
     // json_encode safely translates PHP arrays/objects directly into JavaScript syntax
     const star_systems = <?php echo json_encode($system_data_export); ?>;
     const screenshots = <?php echo json_encode($screenshots); ?>;
-    console.log(star_systems);
+    const jump_routes = <?php echo json_encode($jump_routes); ?>;
+    console.log(jump_routes);
 </script>
 
 <script src="/web/scripts/elite.js"></script>
